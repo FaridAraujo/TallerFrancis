@@ -2,104 +2,158 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Global ─── */
-* {
-  box-sizing: border-box;
-}
-
-html {
-  background: #050505;
-}
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; }
 
 body {
-  background: linear-gradient(135deg, #050505 0%, #0a0a0a 100%);
-  color: #f5f5f5;
   margin: 0;
-  padding: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'DM Sans', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #e8eaed;
+  background: #0d0d0d;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
 }
 
-/* ─── Selection ─── */
-::selection {
-  background: #c0392b;
+::selection { background: #a82318; color: #fff; }
+
+/* ── Metallic button variants ── */
+.btn-red {
+  background: linear-gradient(180deg, #c42b1e 0%, #8f1e13 100%);
+  border: 1px solid #d44030;
+  border-bottom-color: #6e1610;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 1px 3px rgba(0,0,0,0.4);
   color: #fff;
+  transition: filter 0.15s, box-shadow 0.15s;
+  letter-spacing: 0;
+}
+.btn-red:hover {
+  filter: brightness(1.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 6px rgba(0,0,0,0.5);
+}
+.btn-red:active {
+  filter: brightness(0.92);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
 }
 
-/* ─── Scrollbar ─── */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.btn-silver {
+  background: linear-gradient(180deg, #3c3c3c 0%, #272727 100%);
+  border: 1px solid #4a4a4a;
+  border-bottom-color: #1c1c1c;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 1px 3px rgba(0,0,0,0.35);
+  color: #c8cfd8;
+  transition: filter 0.15s, box-shadow 0.15s, color 0.15s;
+  letter-spacing: 0;
 }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #c0392b, #e67e22);
-  border-radius: 1px;
+.btn-silver:hover {
+  filter: brightness(1.12);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 6px rgba(0,0,0,0.45);
 }
-::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #e74c3c, #f39c12); }
+.btn-silver:active {
+  filter: brightness(0.9);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.35);
+}
 
-/* ─── Input base ─── */
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="number"],
-input[type="date"],
+.btn-ghost {
+  background: transparent;
+  border: 1px solid #303030;
+  color: #a4acb8;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  letter-spacing: 0;
+}
+.btn-ghost:hover {
+  border-color: #505050;
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+.btn-ghost:active {
+  background: rgba(255,255,255,0.03);
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
+
+/* ── Form elements ── */
+input[type='text'],
+input[type='email'],
+input[type='tel'],
+input[type='number'],
+input[type='date'],
 select,
 textarea {
-  background: #1a1a1a;
-  border: 1px solid #333333;
-  color: #f5f5f5;
-  border-radius: 2px;
-  padding: 8px 12px;
-  font-size: 14px;
-  font-family: 'IBM Plex Mono', monospace;
+  display: block;
   width: 100%;
-  transition: all 0.2s ease;
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #e8eaed;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 5px;
   outline: none;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  letter-spacing: 0;
 }
 
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="tel"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
+input[type='text']:hover,
+input[type='email']:hover,
+input[type='tel']:hover,
+input[type='number']:hover,
+input[type='date']:hover,
+select:hover,
+textarea:hover { border-color: #424242; }
+
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='tel']:focus,
+input[type='number']:focus,
+input[type='date']:focus,
 select:focus,
 textarea:focus {
-  border-color: #c0392b;
-  box-shadow:
-    inset 0 1px 2px rgba(0,0,0,0.4),
-    0 0 0 3px rgba(192, 57, 43, 0.15);
+  border-color: #c42b1e;
+  box-shadow: 0 0 0 2.5px rgba(196, 43, 30, 0.14);
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.7) brightness(1.1);
+input::placeholder,
+textarea::placeholder { color: #4e5560; }
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(0.35);
   cursor: pointer;
 }
 
-select option {
-  background: #1a1a1a;
-  color: #f5f5f5;
+select {
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235c6570' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
 }
 
-/* ─── Print ─── */
+select option { background: #1a1a1a; color: #e8eaed; }
+textarea { resize: vertical; }
+
+/* ── Print zone — oculto en pantalla, visible solo al imprimir ── */
+.print-zone {
+  position: fixed;
+  visibility: hidden;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
 @media print {
-  @page {
-    size: A4;
-    margin: 0;
-  }
-
-  body * {
-    visibility: hidden !important;
-  }
-
-  .print-zone,
-  .print-zone * {
-    visibility: visible !important;
-  }
-
+  @page { size: A4; margin: 0; }
+  body * { visibility: hidden !important; }
+  .print-zone, .print-zone * { visibility: visible !important; }
   .print-zone {
+    display: block !important;
     position: fixed !important;
     inset: 0 !important;
     width: 210mm !important;
@@ -108,8 +162,5 @@ select option {
     color: #000 !important;
     z-index: 9999 !important;
   }
-
-  .no-print {
-    display: none !important;
-  }
+  .no-print { display: none !important; }
 }

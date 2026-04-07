@@ -1,6 +1,7 @@
 import { Invoice, ShopConfig } from '../types'
 import { tr } from '../utils/i18n'
 import { formatCurrency, formatDate, serviceSubtotal } from '../utils/format'
+import { QRCodeSVG } from 'qrcode.react'
 
 interface Props {
   invoice: Invoice
@@ -27,59 +28,65 @@ export default function InvoicePrint({ invoice, shopConfig }: Props) {
         color:      '#111',
         background: '#fff',
         padding:    '32px 40px',
-        minHeight:  '297mm',
       }}
     >
+      {/* Sello PAGADA */}
+      {invoice.status === 'paid' && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%) rotate(-45deg)',
+          fontSize: '72px',
+          fontWeight: 'bold',
+          color: '#22c55e',
+          opacity: 0.15,
+          textTransform: 'uppercase',
+          letterSpacing: '8px',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }}>
+          PAGADA
+        </div>
+      )}
       {/* ── Header ── */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '28px' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
         <tbody>
-          <tr>
-            {/* Shop info */}
-            <td style={{ verticalAlign: 'top', width: '60%' }}>
-              {shopConfig.logo ? (
-                <img
-                  src={shopConfig.logo}
-                  alt="logo"
-                  style={{ height: '56px', objectFit: 'contain', marginBottom: '8px', display: 'block' }}
-                />
-              ) : (
-                <div style={{
-                  width: '48px', height: '48px', borderRadius: '8px',
-                  background: '#c0392b', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: '8px',
-                }}>
-                  <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '22px' }}>T</span>
-                </div>
-              )}
-              <div style={{ fontWeight: 'bold', fontSize: '17px', lineHeight: '1.3' }}>
+          <tr style={{ verticalAlign: 'top' }}>
+            {/* Left: Shop Info */}
+            <td style={{ width: '30%', paddingRight: '20px', verticalAlign: 'middle' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '6px', color: '#111' }}>
                 {shopConfig.name}
               </div>
-              <div style={{ color: '#555', marginTop: '4px', lineHeight: '1.6', fontSize: '12px' }}>
-                <div>{shopConfig.address}</div>
-                <div>{T.phone}: {shopConfig.phone}</div>
-                {shopConfig.email && <div>{T.email}: {shopConfig.email}</div>}
-                {shopConfig.taxId && <div>RIF/ID: {shopConfig.taxId}</div>}
+              <div style={{ color: '#555', lineHeight: '1.7', fontSize: '12px' }}>
+                {shopConfig.address && <div>{shopConfig.address}</div>}
+                {shopConfig.phone && <div>{shopConfig.phone}</div>}
+                {shopConfig.email && <div>{shopConfig.email}</div>}
               </div>
             </td>
 
-            {/* Invoice meta */}
+            {/* Center: Logo */}
+            <td style={{ width: '40%', textAlign: 'center', paddingBottom: '10px' }}>
+              <img
+                src="/logo-color.png"
+                alt="logo"
+                style={{ height: '160px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+              />
+            </td>
+
+            {/* Right: Invoice Info */}
             <td style={{ verticalAlign: 'top', textAlign: 'right' }}>
               <div style={{
                 fontSize: '26px', fontWeight: 900,
-                color: '#c0392b', letterSpacing: '-0.5px', marginBottom: '10px'
+                color: '#c0392b', letterSpacing: '-0.5px', marginBottom: '6px'
               }}>
                 {T.invoice}
               </div>
-              <table style={{ marginLeft: 'auto', borderCollapse: 'collapse' }}>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#000', marginBottom: '12px', fontFamily: 'monospace', letterSpacing: '1px' }}>
+                {invoice.number}
+              </div>
+              <table style={{ marginLeft: 'auto', borderCollapse: 'collapse', marginBottom: '12px' }}>
                 <tbody>
-                  <tr>
-                    <td style={{ color: '#777', paddingRight: '12px', paddingBottom: '4px', textAlign: 'right', fontSize: '12px' }}>
-                      {T.number}:
-                    </td>
-                    <td style={{ fontWeight: 'bold', paddingBottom: '4px', textAlign: 'right' }}>
-                      {invoice.number}
-                    </td>
-                  </tr>
                   <tr>
                     <td style={{ color: '#777', paddingRight: '12px', paddingBottom: '4px', textAlign: 'right', fontSize: '12px' }}>
                       {T.date}:
@@ -131,12 +138,13 @@ export default function InvoicePrint({ invoice, shopConfig }: Props) {
       <div style={{
         background: '#f9f9f9', border: '1px solid #e8e8e8',
         borderRadius: '8px', padding: '14px 16px', marginBottom: '24px',
+        position: 'relative',
       }}>
         <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#c0392b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
           {T.billTo}
         </div>
-        <div style={{ fontWeight: 'bold', fontSize: '15px' }}>{invoice.clientName}</div>
-        <div style={{ color: '#555', fontSize: '12px', marginTop: '4px', lineHeight: '1.7' }}>
+        <div style={{ fontWeight: 'bold', fontSize: '17px', marginBottom: '2px' }}>{invoice.clientName}</div>
+        <div style={{ color: '#555', fontSize: '13px', marginTop: '4px', lineHeight: '1.7' }}>
           {invoice.clientPhone && <span>{T.phone}: {invoice.clientPhone} &nbsp;</span>}
           {invoice.clientEmail && <span>{T.email}: {invoice.clientEmail}</span>}
           {(invoice.vehicle || invoice.licensePlate) && (
@@ -225,11 +233,21 @@ export default function InvoicePrint({ invoice, shopConfig }: Props) {
       <div style={{
         borderTop: '1px solid #e8e8e8', paddingTop: '16px',
         textAlign: 'center', color: '#888', fontSize: '12px',
+        marginTop: '28px',
+        position: 'relative',
       }}>
         <p style={{ margin: '0 0 4px' }}>{T.thanks}</p>
-        {shopConfig.website && (
-          <p style={{ margin: 0, color: '#c0392b' }}>{shopConfig.website}</p>
-        )}
+        <p style={{ margin: 0, color: '#c0392b', fontWeight: 'bold', fontSize: '13px' }}>
+          {shopConfig.name}
+        </p>
+        <div style={{ position: 'absolute', bottom: '16px', right: '0' }}>
+          <QRCodeSVG
+            value={`${invoice.number}|${formatDate(invoice.date, lang)}|${formatCurrency(invoice.total, 'USD')}`}
+            size={50}
+            level="H"
+            includeMargin={false}
+          />
+        </div>
       </div>
     </div>
   )

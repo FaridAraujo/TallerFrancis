@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Plus, Eye, Pencil, Trash2, TrendingUp, FileText, CheckCircle, Clock } from 'lucide-react'
+import { Search, Plus, Eye, Pencil, Trash2, FileText, Clock, CheckCircle2, TrendingUp } from 'lucide-react'
 import { Invoice, View, InvoiceStatus } from '../types'
 import { formatCurrency, formatDate } from '../utils/format'
 
@@ -12,28 +12,21 @@ interface Props {
 const FILTERS: { value: InvoiceStatus | 'all'; label: string }[] = [
   { value: 'all',       label: 'Todas'     },
   { value: 'draft',     label: 'Borrador'  },
-  { value: 'issued',    label: 'Emitidas'  },
-  { value: 'paid',      label: 'Pagadas'   },
-  { value: 'cancelled', label: 'Canceladas'},
+  { value: 'issued',    label: 'Emitida'   },
+  { value: 'paid',      label: 'Pagada'    },
+  { value: 'cancelled', label: 'Cancelada' },
 ]
 
-const statusBadge: Record<InvoiceStatus, string> = {
-  draft:     'bg-gray-800 text-gray-400 border-gray-700',
-  issued:    'bg-blue-900/40 text-blue-400 border-blue-800/40',
-  paid:      'bg-green-900/40 text-green-400 border-green-800/40',
-  cancelled: 'bg-red-900/30 text-red-400 border-red-900/40',
-}
-
-const statusLabel: Record<InvoiceStatus, string> = {
-  draft:     'Borrador',
-  issued:    'Emitida',
-  paid:      'Pagada',
-  cancelled: 'Cancelada',
+const statusStyle: Record<InvoiceStatus, { cls: string; label: string }> = {
+  draft:     { cls: 'border border-line text-metal-dim bg-raised',              label: 'Borrador'  },
+  issued:    { cls: 'border border-metal/30 text-metal bg-metal-faint',         label: 'Emitida'   },
+  paid:      { cls: 'border border-white/15 text-white bg-white/5',             label: 'Pagada'    },
+  cancelled: { cls: 'border border-accent/30 text-accent-text bg-accent-muted', label: 'Cancelada' },
 }
 
 export default function InvoiceList({ invoices, onNavigate, onDelete }: Props) {
-  const [search, setSearch]   = useState('')
-  const [filter, setFilter]   = useState<InvoiceStatus | 'all'>('all')
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState<InvoiceStatus | 'all'>('all')
 
   const filtered = invoices.filter(inv => {
     const matchStatus = filter === 'all' || inv.status === filter
@@ -46,12 +39,9 @@ export default function InvoiceList({ invoices, onNavigate, onDelete }: Props) {
     return matchStatus && matchSearch
   })
 
-  const stats = {
-    total:   invoices.length,
-    issued:  invoices.filter(i => i.status === 'issued').length,
-    paid:    invoices.filter(i => i.status === 'paid').length,
-    revenue: invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.total, 0),
-  }
+  const paid    = invoices.filter(i => i.status === 'paid')
+  const issued  = invoices.filter(i => i.status === 'issued')
+  const revenue = paid.reduce((s, i) => s + i.total, 0)
 
   function handleDelete(inv: Invoice) {
     if (confirm(`¿Eliminar ${inv.number}? Esta acción no se puede deshacer.`)) {
@@ -59,171 +49,188 @@ export default function InvoiceList({ invoices, onNavigate, onDelete }: Props) {
     }
   }
 
+  const stats = [
+    { label: 'Total',    value: String(invoices.length), note: 'facturas registradas', icon: FileText,     accent: false },
+    { label: 'Emitidas', value: String(issued.length),   note: 'pendientes de cobro',  icon: Clock,        accent: false },
+    { label: 'Pagadas',  value: String(paid.length),     note: 'facturas cobradas',    icon: CheckCircle2, accent: false },
+    { label: 'Ingresos', value: formatCurrency(revenue), note: 'total cobrado',         icon: TrendingUp,   accent: true  },
+  ]
+
   return (
-    <div className="p-6 animate-fadeIn">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="animate-slideInRight" style={{ animationDelay: '0.1s' }}>
-          <h1 className="text-4xl font-black text-white tracking-tight">Facturas</h1>
-          <p className="text-sm text-gray-500 mt-1 font-medium">{invoices.length} factura{invoices.length !== 1 ? 's' : ''} en total</p>
+    <div className="p-8 max-w-7xl mx-auto">
+
+      {/* ── Page header ── */}
+      <div className="flex items-center justify-between mb-7">
+        <div>
+          <h1 className="text-[22px] font-semibold text-white tracking-tight">Facturas</h1>
+          <p className="text-[13px] text-metal-dim mt-0.5">
+            {invoices.length} {invoices.length === 1 ? 'factura registrada' : 'facturas registradas'}
+          </p>
         </div>
         <button
           onClick={() => onNavigate('create')}
-          className="flex items-center gap-2 px-6 py-3 text-sm font-bold
-            bg-gradient-to-br from-brand-red to-brand-red/80
-            hover:from-brand-red-h hover:to-brand-red
-            text-white transition-all duration-200 shadow-lg shadow-brand-red/40
-            hover:shadow-brand-red/60 hover:-translate-y-0.5
-            active:translate-y-0"
+          className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold rounded-md btn-red"
         >
-          <Plus size={18} strokeWidth={2.5} />
+          <Plus size={15} strokeWidth={2.5} />
           Nueva Factura
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[
-          { icon: FileText,    label: "Total",    value: String(stats.total),   color: "from-gray-600 to-gray-700", accent: "text-gray-300" },
-          { icon: Clock,       label: "Emitidas", value: String(stats.issued),  color: "from-blue-600 to-blue-700", accent: "text-blue-300" },
-          { icon: CheckCircle, label: "Pagadas",  value: String(stats.paid),    color: "from-green-600 to-green-700", accent: "text-green-300" },
-          { icon: TrendingUp,  label: "Ingresos", value: formatCurrency(stats.revenue), color: "from-brand-red to-brand-red-d", accent: "text-brand-burn" },
-        ].map(({ icon: Icon, label, value, color, accent }, i) => (
+      {/* ── Stats cards ── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-7">
+        {stats.map(({ label, value, note, icon: Icon, accent }) => (
           <div
             key={label}
-            className="bg-gradient-to-br from-brand-surface to-brand-raised rounded-lg border border-brand-border p-4
-              shadow-lg overflow-hidden relative group hover:border-brand-burn/50 transition-all duration-200"
-            style={{ animation: `fadeInUp 0.5s ease-out ${i * 80}ms backwards` }}
+            className="bg-surface border rounded-xl px-5 py-4 transition-colors"
+            style={{
+              borderColor: accent ? 'rgba(168,35,24,0.35)' : '#303030',
+            }}
           >
-            <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-5 transition-opacity`} />
-            <div className="relative">
-              <div className="flex items-center gap-2 mb-3">
-                <Icon size={16} className={accent} strokeWidth={2} />
-                <span className="text-xs text-gray-500 font-semibold uppercase tracking-widest">{label}</span>
-              </div>
-              <p className={`text-2xl font-black ${accent} tracking-tight`}>{value}</p>
+            <div className="flex items-start justify-between mb-2.5">
+              <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#565e6b' }}>
+                {label}
+              </p>
+              <Icon
+                size={13}
+                strokeWidth={1.5}
+                style={{ color: accent ? 'rgba(212,64,48,0.45)' : 'rgba(100,110,125,0.45)', marginTop: '1px' }}
+              />
             </div>
+            <p className="text-[28px] font-bold text-white tracking-tight leading-none mb-1">
+              {value}
+            </p>
+            <p className="text-[12px]" style={{ color: '#565e6b' }}>{note}</p>
           </div>
         ))}
       </div>
 
-      {/* Search + filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6 animate-slideInRight" style={{ animationDelay: '0.2s' }}>
-        <div className="relative flex-1">
-          <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar factura, cliente, vehículo…"
-            className="!pl-12 !rounded-lg !border-2 !border-brand-border !bg-brand-surface font-medium
-              focus:!border-brand-red focus:!bg-brand-raised"
-          />
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {FILTERS.map((f, i) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-200
-                border-2 relative overflow-hidden group
-                ${filter === f.value
-                  ? 'bg-brand-red border-brand-red text-white shadow-lg shadow-brand-red/40'
-                  : 'border-brand-border text-gray-400 hover:border-brand-burn hover:text-brand-burn'}`}
-              style={{ animation: `fadeInUp 0.4s ease-out ${0.3 + i * 40}ms backwards` }}
-            >
-              <span className="relative z-10">{f.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* ── Table panel ── */}
+      <div className="bg-surface border border-line rounded-xl overflow-hidden">
 
-      {/* Table */}
-      {filtered.length === 0 ? (
-        <div className="text-center py-20 text-gray-600">
-          <FileText size={40} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm">
-            {invoices.length === 0
-              ? 'Aún no hay facturas. ¡Crea la primera!'
-              : 'No se encontraron facturas con ese criterio.'}
-          </p>
-        </div>
-      ) : (
-        <div className="bg-brand-surface rounded-xl border border-brand-border overflow-hidden">
-          {/* Header */}
-          <div className="hidden md:grid grid-cols-[130px_1fr_120px_120px_110px_auto] gap-0
-            text-[11px] font-semibold uppercase tracking-widest text-gray-500 bg-brand-muted">
-            <div className="px-4 py-3">Número</div>
-            <div className="px-4 py-3">Cliente / Vehículo</div>
-            <div className="px-4 py-3">Fecha</div>
-            <div className="px-4 py-3 text-right">Total</div>
-            <div className="px-4 py-3 text-center">Estado</div>
-            <div className="px-4 py-3" />
+        {/* Toolbar */}
+        <div className="flex items-center gap-4 px-5 py-3.5 border-b border-line bg-raised">
+          {/* Search */}
+          <div className="relative flex-1 max-w-xs">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-metal-dim pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar factura, cliente, placa…"
+              className="!pl-9 !py-[7px] !text-[13px] !bg-elevated !border-line hover:!border-lineh"
+            />
           </div>
 
-          {filtered.map((inv, i) => (
-            <div
-              key={inv.id}
-              className={`
-                border-t border-brand-border
-                md:grid md:grid-cols-[130px_1fr_120px_120px_110px_auto]
-                flex flex-col gap-2 p-4 md:p-0 md:gap-0 items-start
-                hover:bg-brand-hover transition-colors cursor-pointer
-                ${i === 0 ? 'border-t-0' : ''}
-              `}
-              onClick={() => onNavigate('detail', inv.id)}
-            >
-              <div className="md:px-4 md:py-3.5 flex items-center">
-                <span className="font-mono text-sm font-bold text-brand-red">{inv.number}</span>
-              </div>
-              <div className="md:px-4 md:py-3.5">
-                <p className="text-sm font-medium text-white truncate">{inv.clientName}</p>
-                {inv.vehicle && <p className="text-xs text-gray-500 mt-0.5 truncate">{inv.vehicle}{inv.licensePlate ? ` · ${inv.licensePlate}` : ''}</p>}
-              </div>
-              <div className="md:px-4 md:py-3.5">
-                <p className="text-sm text-gray-400">{formatDate(inv.date, inv.language)}</p>
-              </div>
-              <div className="md:px-4 md:py-3.5 md:text-right">
-                <p className="text-sm font-semibold text-white">{formatCurrency(inv.total)}</p>
-              </div>
-              <div className="md:px-4 md:py-3.5 md:text-center">
-                <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusBadge[inv.status]}`}>
-                  {statusLabel[inv.status]}
-                </span>
-              </div>
-              <div
-                className="md:px-3 md:py-3 flex items-center gap-1"
-                onClick={e => e.stopPropagation()}
+          {/* Filters */}
+          <div className="flex items-center gap-1">
+            {FILTERS.map(f => (
+              <button
+                key={f.value}
+                onClick={() => setFilter(f.value)}
+                className={`px-2.5 py-1.5 text-[12px] font-medium rounded transition-colors
+                  ${filter === f.value
+                    ? 'btn-silver'
+                    : 'text-metal-dim hover:text-white hover:bg-elevated'}`}
               >
-                <ActionBtn icon={Eye}    title="Ver"      onClick={() => onNavigate('detail', inv.id)} />
-                <ActionBtn icon={Pencil} title="Editar"   onClick={() => onNavigate('edit', inv.id)} />
-                <ActionBtn icon={Trash2} title="Eliminar" onClick={() => handleDelete(inv)} danger />
-              </div>
-            </div>
-          ))}
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Empty state */}
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <div className="w-10 h-10 rounded-full bg-raised border border-line flex items-center justify-center">
+              <FileText size={16} className="text-metal-dim" strokeWidth={1.5} />
+            </div>
+            <p className="text-[13px] text-metal-dim">
+              {invoices.length === 0
+                ? 'Sin facturas. Usa "Nueva Factura" para crear la primera.'
+                : 'Sin resultados para este filtro.'}
+            </p>
+          </div>
+        ) : (
+          <table className="w-full text-[13px]">
+            <thead>
+              <tr className="border-b border-line">
+                <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#555f6d' }}>Número</th>
+                <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#555f6d' }}>Cliente</th>
+                <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider hidden md:table-cell" style={{ color: '#555f6d' }}>Vehículo</th>
+                <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider hidden lg:table-cell" style={{ color: '#555f6d' }}>Fecha</th>
+                <th className="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#555f6d' }}>Total</th>
+                <th className="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#555f6d' }}>Estado</th>
+                <th className="px-5 py-3 w-24" />
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((inv, i) => {
+                const { cls, label } = statusStyle[inv.status]
+                return (
+                  <tr
+                    key={inv.id}
+                    onClick={() => onNavigate('detail', inv.id)}
+                    className={`border-b border-line cursor-pointer hover:bg-elevated transition-colors
+                      ${i === filtered.length - 1 ? 'border-b-0' : ''}`}
+                  >
+                    <td className="px-5 py-3.5">
+                      <span className="font-mono text-[12.5px] font-semibold text-accent-text">{inv.number}</span>
+                    </td>
+                    <td className="px-5 py-3.5 text-white font-medium">{inv.clientName}</td>
+                    <td className="px-5 py-3.5 text-metal hidden md:table-cell">
+                      {inv.vehicle
+                        ? <>{inv.vehicle}{inv.licensePlate && <span className="ml-1.5 text-metal-dim">· {inv.licensePlate}</span>}</>
+                        : <span className="text-metal-dim">—</span>}
+                    </td>
+                    <td className="px-5 py-3.5 text-metal tabular-nums hidden lg:table-cell">
+                      {formatDate(inv.date, inv.language)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-semibold text-white tabular-nums">
+                      {formatCurrency(inv.total)}
+                    </td>
+                    <td className="px-5 py-3.5 text-center">
+                      <span className={`inline-block px-2.5 py-[3px] rounded text-[11.5px] font-medium ${cls}`}>
+                        {label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-0.5">
+                        <IconBtn icon={Eye}    title="Ver"      onClick={() => onNavigate('detail', inv.id)} />
+                        <IconBtn icon={Pencil} title="Editar"   onClick={() => onNavigate('edit', inv.id)} />
+                        <IconBtn icon={Trash2} title="Eliminar" onClick={() => handleDelete(inv)} danger />
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {filtered.length > 0 && (
+        <p className="text-[11px] mt-2.5 text-right" style={{ color: '#3e4550' }}>
+          {filtered.length} {filtered.length === 1 ? 'resultado' : 'resultados'}
+          {(filter !== 'all' || search) ? ` de ${invoices.length}` : ''}
+        </p>
       )}
     </div>
   )
 }
 
-
-function ActionBtn({ icon: Icon, title, onClick, danger }: {
-  icon: typeof Eye
-  title: string
-  onClick: () => void
-  danger?: boolean
+function IconBtn({ icon: Icon, title, onClick, danger }: {
+  icon: typeof Eye; title: string; onClick: () => void; danger?: boolean
 }) {
   return (
     <button
       title={title}
       onClick={onClick}
-      className={`p-1.5 rounded-md transition-colors
+      className={`p-1.5 rounded transition-colors
         ${danger
-          ? 'text-gray-600 hover:text-red-400 hover:bg-red-950/40'
-          : 'text-gray-600 hover:text-white hover:bg-brand-muted'}`}
+          ? 'text-metal-dim hover:text-accent-text hover:bg-accent-muted'
+          : 'text-metal-dim hover:text-white hover:bg-elevated'}`}
     >
-      <Icon size={14} />
+      <Icon size={13} strokeWidth={1.75} />
     </button>
   )
 }

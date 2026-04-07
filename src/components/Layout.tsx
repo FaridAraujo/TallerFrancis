@@ -1,4 +1,4 @@
-import { FileText, Plus, Settings, Wrench, Menu, X } from 'lucide-react'
+import { FileText, Plus, Menu, X, Settings } from 'lucide-react'
 import { useState } from 'react'
 import { View } from '../types'
 
@@ -9,104 +9,91 @@ interface Props {
 }
 
 const nav = [
-  { id: 'list',     label: 'Facturas',       icon: FileText },
-  { id: 'create',   label: 'Nueva Factura',  icon: Plus },
-  { id: 'settings', label: 'Configuración',  icon: Settings },
+  { id: 'list',   label: 'Facturas',      icon: FileText },
+  { id: 'create', label: 'Nueva Factura', icon: Plus },
 ] as const
 
 export default function Layout({ view, onNavigate, children }: Props) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-brand-black">
-      {/* Overlay mobile */}
+    <div className="flex h-screen overflow-hidden bg-bg">
       {open && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-20 lg:hidden animate-fadeIn"
-          onClick={() => setOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/70 z-20 lg:hidden" onClick={() => setOpen(false)} />
       )}
 
-      {/* Sidebar */}
+      {/* ── Sidebar ── */}
       <aside
         className={`
-          fixed lg:static inset-y-0 left-0 z-30
-          w-64 flex flex-col bg-gradient-to-b from-brand-surface via-brand-surface to-brand-raised
-          border-r border-brand-border shadow-2xl
-          transform transition-all duration-300 ease-out
+          fixed lg:static inset-y-0 left-0 z-30 w-56 flex flex-col
+          bg-nav-bg border-r border-nav-border
+          transition-transform duration-200
           ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
-        style={{
-          backgroundImage: `
-            linear-gradient(135deg, transparent 0%, rgba(192, 57, 43, 0.04) 100%),
-            linear-gradient(to bottom, #1a1a1a, #242424)
-          `
-        }}
       >
-        {/* Logo section with accent */}
-        <div className="px-5 py-6 border-b border-brand-border bg-gradient-to-r from-brand-red/10 to-transparent">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-brand-red blur opacity-50" />
-              <div className="relative w-10 h-10 bg-brand-red flex items-center justify-center shadow-lg shadow-brand-red/50">
-                <Wrench size={20} className="text-white" strokeWidth={1.5} />
-              </div>
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-black text-white truncate leading-tight tracking-tight">AutoPro</p>
-              <p className="text-xs text-brand-burn font-medium leading-tight">Facturación</p>
-            </div>
-          </div>
+        {/* Top accent stripe */}
+        <div className="h-[2px] w-full shrink-0" style={{ background: 'linear-gradient(90deg, #c42b1e 0%, #8f1e13 100%)' }} />
+
+        {/* Brand */}
+        <div className="flex items-center justify-center px-4 py-4 border-b border-nav-border">
+          <img src="/logo-white.png" alt="Grupo Master" className="w-40 h-20" />
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-4 space-y-2">
-          {nav.map(({ id, label, icon: Icon }, i) => {
+        <nav className="flex-1 px-2 pt-2.5 space-y-px">
+          {nav.map(({ id, label, icon: Icon }) => {
             const active = view === id
             return (
               <button
                 key={id}
                 onClick={() => { onNavigate(id as View); setOpen(false) }}
                 className={`
-                  w-full flex items-center gap-3 px-4 py-3 text-sm font-500 transition-all duration-200
-                  text-left relative group overflow-hidden
+                  relative w-full flex items-center gap-2.5 px-3 py-[9px] rounded-md text-[13px] text-left
+                  transition-colors duration-150 font-medium
                   ${active
-                    ? 'bg-gradient-to-r from-brand-red to-brand-red/80 text-white shadow-lg shadow-brand-red/30'
-                    : 'text-gray-400 hover:text-white'}
+                    ? 'text-white'
+                    : 'text-metal hover:bg-elevated hover:text-white'}
                 `}
-                style={{
-                  animation: active ? `slideInRight 0.3s ease-out ${i * 50}ms backwards` : 'none'
-                }}
+                style={active ? { background: 'rgba(196,43,30,0.13)' } : {}}
               >
-                {!active && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-brand-red/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                {active && (
+                  <span
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[18px] rounded-r"
+                    style={{ background: '#c42b1e' }}
+                  />
                 )}
-                <Icon size={17} className="relative z-10" strokeWidth={2} />
-                <span className="relative z-10">{label}</span>
+                <Icon
+                  size={15}
+                  strokeWidth={active ? 2 : 1.75}
+                  className={active ? 'text-accent-text' : 'text-metal-dim'}
+                />
+                {label}
               </button>
             )
           })}
         </nav>
 
-        {/* Footer with version */}
-        <div className="px-5 py-4 border-t border-brand-border text-center">
-          <p className="text-xs text-gray-600 font-mono tracking-widest">v1.0.0</p>
-          <p className="text-[10px] text-brand-burn/60 mt-1 font-medium">OFFLINE MODE</p>
+        {/* Footer */}
+        <div className="px-4 py-3.5 border-t border-nav-border flex items-center justify-between">
+          <p className="text-[11px]" style={{ color: '#3e4450' }}>v1.0.0 · Sin conexión</p>
+          <button
+            onClick={() => {/* settings */ }}
+            className="p-1 rounded transition-colors text-metal-dim hover:text-white hover:bg-elevated"
+            title="Configuración"
+          >
+            <Settings size={13} strokeWidth={1.75} />
+          </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-brand-bg">
-        {/* Mobile top bar */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-brand-surface border-b border-brand-border shrink-0 shadow-sm">
-          <button
-            onClick={() => setOpen(true)}
-            className="p-1.5 text-gray-400 hover:text-white transition-colors"
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
+      {/* ── Main ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Mobile topbar */}
+        <header className="lg:hidden flex items-center gap-3 px-4 h-12 bg-surface border-b border-line shrink-0">
+          <button onClick={() => setOpen(true)} className="text-metal hover:text-white transition-colors">
+            {open ? <X size={18} /> : <Menu size={18} />}
           </button>
-          <span className="text-sm font-bold text-white">AutoPro Taller</span>
-          <div className="w-7" />
+          <span className="text-[13px] font-semibold text-white tracking-tight">Grupo Master Automotriz</span>
         </header>
 
         <main className="flex-1 overflow-y-auto">

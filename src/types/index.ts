@@ -14,6 +14,7 @@ export interface Invoice {
   date: string           // YYYY-MM-DD
   dueDate?: string       // YYYY-MM-DD
   clientName: string
+  clientId?: string
   clientPhone?: string
   clientEmail?: string
   vehicle?: string       // "Marca Modelo Año"
@@ -42,7 +43,7 @@ export interface ShopConfig {
   logo?: string          // base64 data URL
 }
 
-export type View = 'list' | 'create' | 'edit' | 'detail' | 'settings'
+export type View = 'list' | 'create' | 'edit' | 'detail'
 
 export type CreateInvoiceData = Omit<Invoice,
   'id' | 'number' | 'subtotal' | 'taxAmount' | 'total' | 'createdAt' | 'updatedAt'

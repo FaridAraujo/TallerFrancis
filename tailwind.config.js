@@ -4,46 +4,43 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          black:    '#050505',
-          red:      '#c0392b',
-          'red-h':  '#e74c3c',
-          'red-d':  '#962d22',
-          burn:     '#e67e22',
-          'burn-h': '#f39c12',
-          bg:       '#0a0a0a',
-          surface:  '#1a1a1a',
-          raised:   '#242424',
-          border:   '#333333',
-          hover:    '#2d2d2d',
-          muted:    '#404040',
+        // Background layers — visually distinct, not flat black
+        bg:       '#111111',   // page background
+        surface:  '#1a1a1a',   // cards / panels
+        raised:   '#222222',   // table headers, toolbars
+        elevated: '#2a2a2a',   // hover states, focused rows
+
+        // Borders
+        line:  '#303030',
+        lineh: '#484848',
+
+        // Metallic red — matched to logo (deep crimson)
+        accent: {
+          DEFAULT: '#a82318',
+          hover:   '#be2a1d',
+          muted:   '#2a0c09',
+          text:    '#d44030',
+        },
+
+        // Metallic silver — secondary text & labels
+        metal: {
+          DEFAULT: '#a4acb8',
+          light:   '#c8cfd8',
+          dim:     '#606870',
+          faint:   '#252a30',
+        },
+
+        // Sidebar — slightly darker than page
+        nav: {
+          bg:     '#0d0d0d',
+          border: '#1e1e1e',
         },
       },
       fontFamily: {
-        sans:     ['Poppins', 'sans-serif'],
-        mono:     ['IBM Plex Mono', 'Courier Prime', 'monospace'],
-        courier:  ['Courier Prime', 'monospace'],
-      },
-      keyframes: {
-        fadeInUp: {
-          '0%': { opacity: '0', transform: 'translateY(12px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideInRight: {
-          '0%': { opacity: '0', transform: 'translateX(-16px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-      },
-      animation: {
-        fadeInUp: 'fadeInUp 0.5s ease-out',
-        fadeIn: 'fadeIn 0.4s ease-out',
-        slideInRight: 'slideInRight 0.4s ease-out',
+        sans: ["'DM Sans'", "'Segoe UI'", 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
     },
   },
   plugins: [],
 }
+

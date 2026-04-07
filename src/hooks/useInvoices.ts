@@ -8,13 +8,13 @@ function uid(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 }
 
-function nextNumber(list: Invoice[]): string {
+function nextNumber(list: Invoice[], clientName: string): string {
   const nums = list.map(inv => {
     const m = inv.number.match(/FAC-(\d+)/)
     return m ? parseInt(m[1], 10) : 0
   })
   const max = nums.length > 0 ? Math.max(...nums) : 0
-  return `FAC-${String(max + 1).padStart(4, '0')}`
+  return `FAC-${String(max + 1).padStart(4, '0')}-${clientName}`
 }
 
 function loadList(): Invoice[] {
@@ -43,7 +43,7 @@ export function useInvoices() {
     const invoice: Invoice = {
       ...data,
       id:        uid(),
-      number:    nextNumber(invoices),
+      number:    nextNumber(invoices, data.clientName),
       ...totals,
       createdAt: now,
       updatedAt: now,

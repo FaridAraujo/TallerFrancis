@@ -1,14 +1,7 @@
-import { useState } from 'react'
+import { SHOP_CONFIG } from '../data/shopConfig'
 import { ShopConfig } from '../types'
-import { loadShopConfig, saveShopConfig } from '../data/shopConfig'
 
-export function useShopConfig() {
-  const [config, setConfig] = useState<ShopConfig>(loadShopConfig)
-
-  function updateConfig(next: ShopConfig) {
-    saveShopConfig(next)
-    setConfig(next)
-  }
-
-  return { config, updateConfig }
+// Config estática — se edita directamente en src/data/shopConfig.ts
+export function useShopConfig(): { config: ShopConfig } {
+  return { config: SHOP_CONFIG }
 }

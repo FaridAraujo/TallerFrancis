@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm install:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm list:*)",
+      "Bash(git remote:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"Mejoras en PDF: número de comprobante grande, QR code, sello PAGADA, datos de taller prominentes:*)"
+    ]
+  }
+}
