@@ -1,75 +1,73 @@
-# 🔧 Taller Facturas
+# Grupo Master Automotriz — Billing System
 
-Sistema de facturación profesional para talleres de enderezado y pintura. **100% offline**, sin backend requerido.
+Cross-platform billing application for an automotive workshop, 
+built with React 18, TypeScript, and Vite. Distributed across 
+Web (PWA), Windows (Electron), and Android (Capacitor) from a 
+single codebase — currently in active use at a real business.
 
-## ✨ Características
+## Tech Stack
 
-- ✅ **Crear, editar y eliminar facturas** — Interfaz intuitiva
-- ✅ **Numeración automática** — FAC-0001, FAC-0002, etc.
-- ✅ **Tabla de servicios editable** — Cantidad, precio, cálculos automáticos
-- ✅ **Totales automáticos** — Subtotal, impuesto, total
-- ✅ **PDF/Imprimir** — Plantilla A4 profesional, HTML+CSS puro
-- ✅ **Bilingüe** — Facturas en Español e Inglés
-- ✅ **Persistencia local** — LocalStorage (offline obligatorio)
-- ✅ **PWA** — Funciona sin conexión, instalable
-- ✅ **Datos fijos del taller** — Nombre, teléfono, dirección, logo
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Tailwind CSS |
+| Build Tool | Vite |
+| Desktop | Electron (Windows .exe installer + portable) |
+| Mobile | Capacitor (Android .apk) |
+| PWA | vite-plugin-pwa + Workbox (offline support) |
+| Persistence | localStorage via custom React hooks |
+| i18n | Custom bilingual layer (ES/EN) |
 
-## 🎨 Diseño
+## Features
 
-- **Paleta**: Negro profundo, rojo metálico, gris carbón
-- **Tipografía**: Poppins + IBM Plex Mono
-- **Estética**: Brutalist Industrial Premium
-- **Animaciones**: Fade + Slide CSS3
+- Full invoice lifecycle: Draft → Issued → Paid → Cancelled
+- Auto-incremental serial numbers (FAC-0001, FAC-0002...)
+- Dynamic service tables with real-time tax calculation
+- Dashboard with total revenue and invoice counts by status
+- Full-text and status filtering across all records
+- Print-optimized PDF with dedicated InvoicePrint component
+  and diagonal "PAGADA" watermark on paid invoices
+- Configurable shop settings (name, address, logo, tax rate)
+- Bilingual invoice output (Spanish / English)
+- PWA offline support via Workbox service worker
 
-## 🚀 Instalación
+## Architecture
+
+Custom hooks handle all business logic and persistence:
+
+- `useInvoices` — Full CRUD, filtering, search, 
+   and serial number management
+- `useShopConfig` — Business settings and configuration
+
+SPA view system (list / create / edit / detail) 
+implemented without an external router.
+
+PDF generation uses a dedicated `InvoicePrint` component 
+with `@media print` A4 layout — invisible on screen, 
+rendered only on print.
+
+## Getting Started
 
 ```bash
 npm install
-```
-
-## 🏃 Desarrollo
-
-```bash
 npm run dev
 ```
 
-Abre [http://localhost:5173](http://localhost:5173)
-
-## 📦 Producción
+## Build
 
 ```bash
+# Web / PWA
 npm run build
+
+# Windows (requires Electron Builder)
+npm run electron:build
+
+# Android (requires Capacitor + Android Studio)
+npx cap sync
+npx cap open android
 ```
 
-Genera en `dist/` listo para deploy.
+## Distribution
 
-## 💾 Datos
-
-Todo se guarda en **LocalStorage**:
-- `invoices` — Array de facturas
-- `shop_config` — Configuración del taller
-
-## 🖨️ PDF
-
-Imprimir o guardar como PDF desde el navegador:
-1. Abre una factura
-2. Click "PDF"
-3. `Ctrl+P` / `Cmd+P`
-4. Guardar como PDF
-
-## 📱 Mobile
-
-Responsive en tablets y móviles. Sidebar colapsible en pantallas pequeñas.
-
-## ⚙️ Configuración
-
-En **Configuración**:
-- Nombre del taller
-- Teléfono, email, dirección
-- Logo (PNG/JPG, máx 500KB)
-- Impuesto por defecto
-- Moneda (USD, EUR, MXN, etc.)
-
----
-
-**Hecho con ❤️ usando React + TypeScript + Tailwind**
+- **Web** — Deploy the `dist/` folder to any static host
+- **Windows** — Generates NSIS installer and portable .exe
+- **Android** — Generates .apk for direct distribution
